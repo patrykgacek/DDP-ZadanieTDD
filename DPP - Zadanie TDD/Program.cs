@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DPP___Zadanie_TDD
+﻿namespace DPP___Zadanie_TDD
 {
     public enum TransactionStatus
     {
@@ -38,67 +32,100 @@ namespace DPP___Zadanie_TDD
     public class RefundException(string message) : Exception(message) {}
 
 
+    public interface ILogger
+    {
+        void Log(string message);
+    }
 
-    public class PaymentProcessor(IPaymentGateway paymentGateway)
+
+    public class Logger: ILogger
+    {
+        public void Log(string message)
+        {
+            Console.WriteLine(message);
+        }
+    }
+
+
+    public class PaymentProcessor(IPaymentGateway paymentGateway, ILogger logger)
     {
         private readonly IPaymentGateway _paymentGateway = paymentGateway;
+        private readonly ILogger _logger = logger;
 
         public TransactionResult ProcessPayment(string userId, double amount)
         {
-            if (string.IsNullOrEmpty(userId)) return new TransactionResult(false, "", "Pusty user Id");
-            if (amount <= 0) return new TransactionResult(false, "", "Amount <= 0");
+            if (string.IsNullOrEmpty(userId))
+            {
+                _logger.Log("userId not provided");
+                return new TransactionResult(false, "", "");
+            };
+            if (amount <= 0)
+            {
+                _logger.Log("Amount negative or zero");
+                return new TransactionResult(false, "", "");
+            }
 
             try
             {
                 var result = _paymentGateway.Charge(userId, amount);
-                Console.WriteLine(result.Success ? "ProcessPayment zakończony powodzeniem" : "ProcessPayment zakończony niepowodzeniem");
+                _logger.Log(result.Success ? "ProcessPayment successful" : "ProcessPayment failed");
                 return result;
             }
-            catch (NetworkException ex)
+            catch (NetworkException)
             {
-                Console.WriteLine("NetworkException: " + ex.Message);
-                return new TransactionResult(false, "", "NetworkException: " + ex.Message);
+                _logger.Log("ProcessPayment NetworkException");
+                return new TransactionResult(false, "", "");
             }
-            catch (PaymentException ex)
+            catch (PaymentException)
             {
-                Console.WriteLine("PaymentException: " + ex.Message);
-                return new TransactionResult(false, "", "PaymentException: " + ex.Message);
+                _logger.Log("ProcessPayment PaymentException");
+                return new TransactionResult(false, "", "");
             }
         }
 
         public TransactionResult RefundPayment(string transactionId)
         {
-            if (string.IsNullOrEmpty(transactionId)) return new TransactionResult(false, "", "Pusty transactionId");
+            if (string.IsNullOrEmpty(transactionId))
+            {
+                _logger.Log("Transaction ID not provided");
+                return new TransactionResult(false, "", "");
+            }
 
             try
             {
                 var result = _paymentGateway.Refund(transactionId);
-                Console.WriteLine(result.Success ? "RefundPayment zakończony powodzeniem" : "RefundPayment zakończony niepowodzeniem");
+                _logger.Log(result.Success ? "RefundPayment successful" : "RefundPayment failed");
                 return result;
             }
-            catch (NetworkException ex)
+            catch (NetworkException)
             {
-                Console.WriteLine("NetworkException: " + ex.Message);
-                return new TransactionResult(false, "", "NetworkException: " + ex.Message);
+                _logger.Log("RefundPayment NetworkException");
+                return new TransactionResult(false, "", "");
             }
-            catch (RefundException ex)
+            catch (RefundException)
             {
-                Console.WriteLine("RefundException: " + ex.Message);
-                return new TransactionResult(false, "", "RefundException: " + ex.Message);
+                _logger.Log("RefundPayment PaymentException");
+                return new TransactionResult(false, "", "");
             }
         }
 
         public TransactionStatus GetPaymentStatus(string transactionId)
         {
-            if (string.IsNullOrEmpty(transactionId)) throw new ArgumentException("Transaction ID cannot be empty.");
+            if (string.IsNullOrEmpty(transactionId))
+            {
+                _logger.Log("Transaction ID not provided");
+                return TransactionStatus.FAILED;
+            }
 
             try
             {
-                return _paymentGateway.GetStatus(transactionId);
+                var status = _paymentGateway.GetStatus(transactionId);
+                _logger.Log("GetPaymentStatus successful");
+                return status;
             }
-            catch (NetworkException ex)
+            catch (NetworkException)
             {
-                Console.WriteLine("NetworkException: " + ex.Message);
+                _logger.Log("GetPaymentStatus NetworkException");
                 return TransactionStatus.FAILED;
             }
         }
