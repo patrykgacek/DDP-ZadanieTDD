@@ -11,29 +11,29 @@ namespace DPP___Zadanie_TDD
 
     public class PaymentGatewayMockStubSpy() : IPaymentGateway
     {
-        // Weryfikacja wywołań: Weryfikacja liczby wywołań poszczególnych metod.
+        // Verification of calls: Verification of the number of calls to individual methods.
         public int ChargeCallCount { get; private set; } = 0;
         public int RefundCallCount { get; private set; } = 0;
         public int GetStatusCallCount { get; private set; } = 0;
 
-        // Weryfikacja wywołań: Sprawdzenie, czy metody PaymentGateway zostały wywołane z oczekiwanymi parametrami.
+        // Verification of calls: Checking if the PaymentGateway methods were called with the expected parameters.
         public List<(string userId, double amount)> ChargeParameters { get; private set; } = [];
         public List<string> RefundParameters { get; private set; } = [];
         public List<string> GetStatusParameters { get; private set; } = [];
 
 
-        // Upewnienie się, że wyjątki z PaymentGateway nie powodują przerwania działania PaymentProcessor.
-        // Sprawdzenie, czy wyjątki są obsługiwane i przekazywane w odpowiedni sposób.
-        // Obsługa wyjątków - processPayment, refundPayment, getPaymentStatus.
+        // Ensuring that exceptions from PaymentGateway do not interrupt the operation of PaymentProcessor.
+        // Checking if exceptions are handled and passed appropriately.
+        // Exception handling - processPayment, refundPayment, getPaymentStatus.
         public bool ShouldThrowNetworkException { get; set; } = false;
         public bool ShouldThrowPaymentException { get; set; } = false;
         public bool ShouldThrowRefundException { get; set; } = false;
 
 
-        // processPayment: Niepowodzenie płatności z powodu braku środków.
+        // processPayment: Payment failure due to insufficient funds.
         public bool IsEnoughMoney { get; set; } = true;
 
-        // Obsługa nieistniejącej transakcji.
+        // Handling of a non-existent transaction.
         public string TransactionIdStub { get; set; } = Guid.NewGuid().ToString();
 
 
@@ -121,7 +121,7 @@ namespace DPP___Zadanie_TDD
 
 
 
-        // processPayment | Prawidłowe przetworzenie płatności
+        // processPayment | Correct processing of the payment.
         [Fact]
         public void ProcessPayment_Success()
         {
@@ -132,7 +132,7 @@ namespace DPP___Zadanie_TDD
             Assert.NotEmpty(result.TransactionId);
         }
 
-        // processPayment | Niepowodzenie płatności z powodu braku środków
+        // processPayment | Payment failure due to insufficient funds.
         [Fact]
         public void ProcessPayment_NotEnoughMoney()
         {
@@ -144,8 +144,8 @@ namespace DPP___Zadanie_TDD
             Assert.NotEmpty(result.TransactionId);
         }
 
-        // processPayment | Obsługa wyjątków NetworkException i PaymentException | NetworkException
-        // Symulowanie rzucania wyjątków przez metody PaymentGateway.
+        // processPayment | Handling of NetworkException and PaymentException | NetworkException
+        // Simulating throwing exceptions by PaymentGateway methods.
         [Fact]
         public void ProcessPayment_NetworkException()
         {
@@ -157,8 +157,8 @@ namespace DPP___Zadanie_TDD
             Assert.Empty(result.TransactionId);
         }
 
-        // processPayment | Obsługa wyjątków NetworkException i PaymentException | PaymentException
-        // Symulowanie rzucania wyjątków przez metody PaymentGateway.
+        // processPayment | Handling of NetworkException and PaymentException | PaymentException
+        // Simulating throwing exceptions by PaymentGateway methods.
         [Fact]
         public void ProcessPayment_PaymentException()
         {
@@ -171,7 +171,7 @@ namespace DPP___Zadanie_TDD
         }
 
 
-        // processPayment | Walidacja nieprawidłowych danych wejściowych | Pusty userId
+        // processPayment | Validation of invalid input data | Empty userId
         [Fact]
         public void ProcessPayment_EmptyUserId()
         {
@@ -182,7 +182,7 @@ namespace DPP___Zadanie_TDD
             Assert.Empty(result.TransactionId);
         }
 
-        // processPayment | Walidacja nieprawidłowych danych wejściowych | Zerowy amount
+        // processPayment | Validation of invalid input data | Zero amount
         [Fact]
         public void ProcessPayment_EmptyAmount()
         {
@@ -193,7 +193,7 @@ namespace DPP___Zadanie_TDD
             Assert.Empty(result.TransactionId);
         }
 
-        // processPayment | Walidacja nieprawidłowych danych wejściowych | Ujemny amount
+        // processPayment | Validation of invalid input data | Negative amount
         [Fact]
         public void ProcessPayment_NegativeAmount()
         {
@@ -204,7 +204,7 @@ namespace DPP___Zadanie_TDD
             Assert.Empty(result.TransactionId);
         }
 
-        // refundPayment | Prawidłowe dokonanie zwrotu
+        // refundPayment | Correct processing of the refund
         [Fact]
         public void RefundPayment_Success()
         {
@@ -216,7 +216,7 @@ namespace DPP___Zadanie_TDD
             Assert.NotEmpty(result.TransactionId);
         }
 
-        // refundPayment | Niepowodzenie zwrotu z powodu nieistniejącej transakcji
+        // refundPayment | Refund failure due to non-existent transaction
         [Fact]
         public void RefundPayment_NonExistingTransaction()
         {
@@ -227,8 +227,8 @@ namespace DPP___Zadanie_TDD
             Assert.Empty(result.TransactionId);
         }
 
-        // refundPayment | Obsługa wyjątków NetworkException i RefundException | NetworkException
-        // Symulowanie rzucania wyjątków przez metody PaymentGateway.
+        // refundPayment | Handling of NetworkException and RefundException | NetworkException
+        // Simulating throwing exceptions by PaymentGateway methods.
         [Fact]
         public void RefundPayment_NetworkException()
         {
@@ -241,7 +241,7 @@ namespace DPP___Zadanie_TDD
             Assert.Empty(result.TransactionId);
         }
 
-        // getPaymentStatus || Pobranie poprawnego statusu transakcji.
+        // getPaymentStatus || Retrieving the correct transaction status.
         [Fact]
         public void GetPaymentStatus_Success()
         {
@@ -251,7 +251,7 @@ namespace DPP___Zadanie_TDD
             Assert.Equal(TransactionStatus.COMPLETED, result);
         }
 
-        // getPaymentStatus || Obsługa nieistniejącej transakcji.
+        // getPaymentStatus || Handling of a non-existent transaction.
         [Fact]
         public void GetPaymentStatus_NonExistingTransaction()
         {
@@ -260,7 +260,7 @@ namespace DPP___Zadanie_TDD
             Assert.Equal(TransactionStatus.FAILED, result);
         }
 
-        // getPaymentStatus || Obsługa wyjątków NetworkException.
+        // getPaymentStatus || Handling of NetworkException.
         [Fact]
         public void GetPaymentStatus_NetworkException()
         {
@@ -271,8 +271,8 @@ namespace DPP___Zadanie_TDD
             Assert.Equal(TransactionStatus.FAILED, result);
         }
 
-        // Symulowanie różnych odpowiedzi metod charge, refund i getStatus.
-        // Konfiguracja zwracanych wartości TransactionResult i TransactionStatus.
+        // Simulating different responses from the charge, refund, and getStatus methods.
+        // Configuration of returned values for TransactionResult and TransactionStatus.
         [Fact]
         public void ProcessPayment_SimulatedResult()
         {
@@ -316,7 +316,7 @@ namespace DPP___Zadanie_TDD
         }
 
 
-        // Sprawdzenie, czy metody PaymentGateway zostały wywołane z oczekiwanymi parametrami. | ProcessPayment
+        // Checking if the PaymentGateway methods were called with the expected parameters. | ProcessPayment
         [Fact]
         public void ProcessPayment_Parameters()
         {
@@ -324,7 +324,7 @@ namespace DPP___Zadanie_TDD
             Assert.Equal((_userId, _amount), _paymentGatewaySpy.ChargeParameters[0]);
         }
 
-        // Sprawdzenie, czy metody PaymentGateway zostały wywołane z oczekiwanymi parametrami. | RefundPayment
+        // Checking if the PaymentGateway methods were called with the expected parameters. | RefundPayment
         [Fact]
         public void RefundPayment_Parameters()
         {
@@ -333,7 +333,7 @@ namespace DPP___Zadanie_TDD
             Assert.Equal(chargeResult.TransactionId, _paymentGatewaySpy.RefundParameters[0]);
         }
 
-        // Sprawdzenie, czy metody PaymentGateway zostały wywołane z oczekiwanymi parametrami. | GetPaymentStatus
+        // Checking if the PaymentGateway methods were called with the expected parameters. | GetPaymentStatus
         [Fact]
         public void GetPaymentStatus_Parameters()
         {
@@ -342,7 +342,7 @@ namespace DPP___Zadanie_TDD
             Assert.Equal(chargeResult.TransactionId, _paymentGatewaySpy.GetStatusParameters[0]);
         }
 
-        // Weryfikacja liczby wywołań poszczególnych metod. | ProcessPayment
+        // Verification of the number of calls to individual methods. | ProcessPayment
         [Fact]
         public void ProcessPayment_CallCount()
         {
@@ -370,7 +370,7 @@ namespace DPP___Zadanie_TDD
             Assert.Equal(0, _paymentGatewaySpy.GetStatusCallCount);
         }
 
-        // Weryfikacja liczby wywołań poszczególnych metod. | RefundPayment
+        // Verification of the number of calls to individual methods. | RefundPayment
         [Fact]
         public void ProcessPayment_NotCalled() {
             Assert.Equal(0, _paymentGatewaySpy.ChargeCallCount);
@@ -398,7 +398,7 @@ namespace DPP___Zadanie_TDD
             Assert.Equal(0, _paymentGatewaySpy.GetStatusCallCount);
         }
 
-        // Weryfikacja liczby wywołań poszczególnych metod. | GetPaymentStatus
+        // Verification of the number of calls to individual methods. | GetPaymentStatus
         [Fact]
         public void GetPaymentStatus_CallCount()
         {
