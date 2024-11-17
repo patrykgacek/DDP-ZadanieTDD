@@ -9,42 +9,6 @@ using Xunit;
 namespace DPP___Zadanie_TDD
 {
 
-    // Obsługa nieistniejącej transakcji.
-    public class Transaction(string userId, double amount, string transactionId, TransactionStatus status)
-    {
-        public string UserId { get; set; } = userId;
-        public double Amount { get; set; } = amount;
-        public string TransactionId { get; set; } = transactionId;
-        public TransactionStatus Status { get; set; } = status;
-    }
-
-    public class Transactions
-    {
-        private readonly Dictionary<string, Transaction> _transactions = [];
-
-        public Transaction this[string transactionId]
-        {
-            get
-            {
-                if (_transactions.TryGetValue(transactionId, out var transaction))
-                {
-                    return transaction;
-                }
-                throw new KeyNotFoundException($"Tranzakcja o ID {transactionId} nie istnieje.");
-            }
-            set
-            {
-                _transactions[transactionId] = value;
-            }
-        }
-
-        public void AddTransaction(Transaction transaction)
-        {
-            _transactions[transaction.TransactionId] = transaction;
-        }
-    }
-
-
     public class PaymentGatewayMockStubSpy() : IPaymentGateway
     {
         // Weryfikacja wywołań: Weryfikacja liczby wywołań poszczególnych metod.
@@ -65,11 +29,12 @@ namespace DPP___Zadanie_TDD
         public bool ShouldThrowPaymentException { get; set; } = false;
         public bool ShouldThrowRefundException { get; set; } = false;
 
-        // Obsługa nieistniejącej transakcji.
-        public Transactions transactions = new();
 
         // processPayment: Niepowodzenie płatności z powodu braku środków.
         public bool IsEnoughMoney { get; set; } = true;
+
+        // Obsługa nieistniejącej transakcji.
+        public string TransactionIdStub { get; set; } = Guid.NewGuid().ToString();
 
 
         public bool IsFakeResult { get; set; } = false;
@@ -93,15 +58,12 @@ namespace DPP___Zadanie_TDD
                 return FakeResult;
 
             var transactionId = Guid.NewGuid().ToString();
-            transactions.AddTransaction(new Transaction(userId, amount, transactionId, TransactionStatus.PENDING));
 
             if (!IsEnoughMoney)
             {
-                transactions[transactionId].Status = TransactionStatus.FAILED;
                 return new TransactionResult(false, transactionId, "Brak środków na koncie");
             }
 
-            transactions[transactionId].Status = TransactionStatus.COMPLETED;
             return new TransactionResult(true, transactionId, "Charge pomyślnie");
         }
 
@@ -119,17 +81,9 @@ namespace DPP___Zadanie_TDD
             if (IsFakeResult)
                 return FakeResult;
 
-            try
-            {
-                var transaction = transactions[transactionId];
-                transactions[transactionId].Status = TransactionStatus.PENDING;
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return new TransactionResult(false, "", ex.Message);
-            }
+            if (this.TransactionIdStub != transactionId)
+                return new TransactionResult(false, "", "Tranzakcja o ID " + transactionId + " nie istnieje.");
 
-            transactions[transactionId].Status = TransactionStatus.COMPLETED;
             return new TransactionResult(true, transactionId, "Refund pomyślnie");
         }
 
@@ -144,17 +98,10 @@ namespace DPP___Zadanie_TDD
             if (IsFakeStatus)
                 return FakeStatus;
 
-            try
-            {
-                var transaction = transactions[transactionId];
-                return transaction.Status;
-            }
-            catch (KeyNotFoundException)
-            {
+            if (this.TransactionIdStub != transactionId)
                 return TransactionStatus.FAILED;
-            }
 
-           
+            return TransactionStatus.COMPLETED;
         }
     }
 
