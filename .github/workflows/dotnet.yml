@@ -11,8 +11,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
+  lint:
+    needs: build-and-test
 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Super-Linter
+        uses: super-linter/super-linter@v7.2.0
+            
+
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
