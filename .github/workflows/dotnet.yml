@@ -34,14 +34,17 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Install coverage tools
+    - name: Install Coverlet
       run: |
         dotnet tool install --global coverlet.console
-        dotnet tool install --global dotnet-reportgenerator-globaltool
+        dotnet tool list -g
+    
     - name: Restore dependencies
       run: dotnet restore
+    
     - name: Build
       run: dotnet build --no-restore --configuration Release
+    
     - name: Run Tests with Coverage
       run: |
         dotnet test \
@@ -49,18 +52,13 @@ jobs:
           --verbosity normal \
           --configuration Release \
           /p:CollectCoverage=true \
-          /p:CoverageOutputFormat=console \
-          /p:Exclude="[xunit*]*" \
           /p:CoverletOutputFormat=lcov \
           /p:CoverletOutput=./coverage/coverage.lcov
-    - name: Display Coverage Summary
+    
+    - name: Display Coverage Report
       run: |
+        export PATH="$PATH:/home/runner/.dotnet/tools"
         coverlet "./DPP - Zadanie TDD/bin/Release/net8.0/DPP - Zadanie TDD.dll" \
           --target "dotnet" \
           --targetargs "test --no-build --configuration Release" \
-          --format lcov \
-          --output ./coverage/coverage.lcov
-
-        dotnet tool run coverlet \
-          ./coverage/coverage.lcov \
           --format lcov
