@@ -53,7 +53,9 @@ jobs:
           --configuration Release \
           /p:CollectCoverage=true \
           /p:CoverletOutputFormat=lcov \
-          /p:CoverletOutput=./coverage/coverage.lcov
+          /p:CoverletOutput=./coverage/coverage.lcov \
+          /p:Exclude="[xunit*]*" \
+          /p:Include="[*]*.cs"
     
     - name: Display Coverage Report
       run: |
