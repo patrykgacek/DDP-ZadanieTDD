@@ -48,14 +48,12 @@ jobs:
     - name: Run Tests with Coverage
       run: |
         dotnet test \
-          --no-build \
           --verbosity normal \
-          --configuration Release \
           /p:CollectCoverage=true \
           /p:CoverletOutputFormat=lcov \
           /p:CoverletOutput=./coverage/coverage.lcov \
           /p:Exclude="[xunit*]*" \
-          /p:Include="[*]*.cs"
+          /p:Include="[*]*"
     
     - name: Display Coverage Report
       run: |
