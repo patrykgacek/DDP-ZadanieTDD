@@ -45,20 +45,10 @@ jobs:
     - name: Build
       run: dotnet build --no-restore --configuration Release
     
-    - name: Run Tests with Coverage
-      run: |
-        dotnet test \
-          --verbosity normal \
-          /p:CollectCoverage=true \
-          /p:CoverletOutputFormat=lcov \
-          /p:CoverletOutput=./coverage/coverage.lcov \
-          /p:Exclude="[xunit*]*" \
-          /p:Include="[*]*"
-    
+    - name: Run Tests
+      run: dotnet test --no-build --verbosity normal
+      
     - name: Display Coverage Report
       run: |
         export PATH="$PATH:/home/runner/.dotnet/tools"
-        coverlet "./DPP - Zadanie TDD/bin/Release/net8.0/DPP - Zadanie TDD.dll" \
-          --target "dotnet" \
-          --targetargs "test --no-build --configuration Release" \
-          --format lcov
+        coverlet "./TestProject/bin/Debug/net8.0/TestProject.dll" --target "dotnet" --targetargs "test --no-build"
