@@ -1,6 +1,8 @@
-﻿using Xunit;
+using DPP___Zadanie_TDD;
+using Xunit;
 
-namespace DPP___Zadanie_TDD
+
+namespace TestProject
 {
     public class LoggerMock : ILogger
     {
@@ -109,7 +111,7 @@ namespace DPP___Zadanie_TDD
     }
 
 
-    public class  PaymentProcessorBasicTests
+    public class PaymentProcessorBasicTests
     {
         public required LoggerMock _loggerMock;
         public required PaymentProcessor _paymentProcessor;
@@ -122,7 +124,7 @@ namespace DPP___Zadanie_TDD
             _loggerMock = new LoggerMock();
             _paymentGatewayMockStubSpy = new PaymentGatewayMockStubSpy();
             _paymentProcessor = new PaymentProcessor(_paymentGatewayMockStubSpy, _loggerMock);
-               
+
         }
 
 
@@ -376,7 +378,8 @@ namespace DPP___Zadanie_TDD
 
         // Verification of the number of calls to individual methods. | RefundPayment
         [Fact]
-        public void ProcessPayment_NotCalled() {
+        public void ProcessPayment_NotCalled()
+        {
             Assert.Equal(0, _paymentGatewayMockStubSpy.ChargeCallCount);
             Assert.Equal(0, _paymentGatewayMockStubSpy.RefundCallCount);
             Assert.Equal(0, _paymentGatewayMockStubSpy.GetStatusCallCount);
@@ -431,5 +434,4 @@ namespace DPP___Zadanie_TDD
         }
 
     }
-
 }
