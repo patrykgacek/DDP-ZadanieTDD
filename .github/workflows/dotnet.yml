@@ -55,7 +55,9 @@ jobs:
           /p:CoverletOutput=./coverage/coverage.lcov
     - name: Display Coverage Summary
       run: |
-        coverlet ./coverage/coverage.lcov \
+        coverlet "./DPP - Zadanie TDD/bin/Release/net8.0/DPP - Zadanie TDD.dll" \
+          --target "dotnet" \
+          --targetargs "test --no-build --configuration Release" \
           --format console \
           --output ./coverage/summary.txt
         cat ./coverage/summary.txt
