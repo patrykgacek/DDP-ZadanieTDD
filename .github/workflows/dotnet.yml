@@ -26,6 +26,7 @@ jobs:
           VALIDATE_GIT_COMMITLINT: false
           VALIDATE_YAML_PRETTIER: false
           VALIDATE_CSHARP: false
+          VALIDATE_JSCPD: false
           
           
             
