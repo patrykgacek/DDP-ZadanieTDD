@@ -23,10 +23,11 @@ jobs:
         uses: super-linter/super-linter@v7.2.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CHECKOV_FILE_NAME: false
+          VALIDATE_GIT_COMMITLINT: false
           JSCPD_CONFIG_FILE: false
           VALIDATE_YAML_PRETTIER: false
           VALIDATE_CSHARP: false
+          
           
             
 
