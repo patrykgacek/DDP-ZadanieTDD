@@ -24,7 +24,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_GIT_COMMITLINT: false
-          JSCPD_CONFIG_FILE: false
           VALIDATE_YAML_PRETTIER: false
           VALIDATE_CSHARP: false
           
